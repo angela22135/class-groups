@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리반 모둠 나누기</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #10b981;
+      --success-hover: #059669;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Pretendard", "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #0f172a;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.6rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: #e2e8f0;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* 설정 패널 */
+    .config-panel {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .form-label {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* 세그먼트 버튼 (모둠수 vs 인원수) */
+    .segmented-control {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+
+    .segmented-btn {
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .segmented-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 숫자 입력 스텝퍼 */
+    .stepper {
+      display: flex;
+      align-items: center;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .stepper button {
+      width: 52px;
+      height: 52px;
+      border: none;
+      background: #f8fafc;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .stepper button:hover {
+      background: #e2e8f0;
+    }
+
+    .stepper input {
+      flex: 1;
+      height: 52px;
+      border: none;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      outline: none;
+      width: 100%;
+    }
+
+    /* 결석 번호 선택 영역 */
+    .absence-section {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .absence-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .absence-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .absence-count-badge {
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .chip {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+
+    .chip:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .chip.absent {
+      background: #fee2e2;
+      border-color: #f87171;
+      color: #b91c1c;
+      text-decoration: line-through;
+      opacity: 0.85;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* 이름 입력 아코디언 */
+    details.names-accordion {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      padding: 0.75rem 1rem;
+    }
+
+    details.names-accordion summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #475569;
+      user-select: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .names-input-container {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .names-input-container textarea {
+      width: 100%;
+      height: 90px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+    }
+
+    .names-input-container textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .names-hint {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* 메인 실행 버튼 */
+    .btn-divide-main {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 1.1rem;
+      font-size: 1.4rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-divide-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+      filter: brightness(1.05);
+    }
+
+    .btn-divide-main:active {
+      transform: translateY(0);
+    }
+
+    /* 결과 섹션 */
+    .results-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .results-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: #ffffff;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .results-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .results-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s;
+    }
+
+    .btn-action:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-action.highlight {
+      background: #fef3c7;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+
+    .btn-action.highlight:hover {
+      background: #fde68a;
+    }
+
+    .btn-action.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-action.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .drag-hint {
+      font-size: 0.95rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #f8fafc;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border);
+    }
+
+    /* 5분 활동 타이머 (대형 디스플레이) */
+    .timer-container {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-lg);
+      border: 2px solid #334155;
+      animation: timerFadeIn 0.25s ease-out;
+    }
+
+    .timer-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .timer-display {
+      font-size: clamp(3.8rem, 9vw, 6rem);
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, "Courier New", monospace;
+      letter-spacing: 3px;
+      line-height: 1;
+      color: #38bdf8;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+      transition: color 0.3s;
+      user-select: none;
+    }
+
+    .timer-display.warning {
+      color: #fbbf24;
+      text-shadow: 0 0 25px rgba(251, 191, 36, 0.45);
+    }
+
+    .timer-display.danger {
+      color: #f87171;
+      text-shadow: 0 0 30px rgba(248, 113, 113, 0.6);
+      animation: timerPulse 1s infinite;
+    }
+
+    .timer-progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #334155;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .timer-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+      width: 100%;
+      transition: width 1s linear, background 0.3s;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .timer-btn {
+      background: #334155;
+      color: #ffffff;
+      border: 1px solid #475569;
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 1.25rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s;
+    }
+
+    .timer-btn:hover {
+      background: #475569;
+    }
+
+    .timer-btn.primary {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+    }
+
+    .timer-btn.primary:hover {
+      background: #7dd3fc;
+    }
+
+    .timer-btn.close {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 0.4rem 0.6rem;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .timer-btn.close:hover {
+      color: #ffffff;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+
+    @keyframes timerFadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 모둠 카드 그리드 */
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* 전자칠판에서 전체화면 시 더 돋보이도록 */
+    :fullscreen .groups-grid {
+      gap: 1.5rem;
+    }
+
+    .group-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .group-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .group-card.drag-over {
+      border: 2px dashed var(--primary);
+      background: var(--primary-light);
+    }
+
+    .group-header {
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.25rem;
+    }
+
+    .group-count-tag {
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .group-members-list {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 120px;
+      flex: 1;
+    }
+
+    /* 학생 칩 (결과 화면) */
+    .student-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      font-size: 1.25rem;
+      font-weight: 750;
+      color: #1e293b;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.15s;
+    }
+
+    .student-item:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      transform: translateX(3px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .student-item:active {
+      cursor: grabbing;
+    }
+
+    .student-item.is-leader {
+      background: #fffbeb;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 1px #f59e0b;
+    }
+
+    .student-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .student-num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      color: #ffffff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1.05rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .student-item.is-leader .student-num-badge {
+      background: #d97706;
+    }
+
+    .student-name {
+      font-size: 1.25rem;
+      color: #0f172a;
+    }
+
+    .leader-badge {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid #fde68a;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .leader-btn-toggle {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      border-radius: 4px;
+      opacity: 0.6;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .leader-btn-toggle:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+
+    /* 토스트 알림 */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.85rem 1.5rem;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* 모둠별 테마 색상 */
+    .theme-1 .group-header { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .theme-2 .group-header { background: linear-gradient(135deg, #10b981, #059669); }
+    .theme-3 .group-header { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .theme-4 .group-header { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .theme-5 .group-header { background: linear-gradient(135deg, #ec4899, #db2777); }
+    .theme-6 .group-header { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .theme-7 .group-header { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .theme-8 .group-header { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+    .theme-9 .group-header { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+    .theme-10 .group-header { background: linear-gradient(135deg, #84cc16, #65a30d); }
+    .theme-11 .group-header { background: linear-gradient(135deg, #a855f7, #9333ea); }
+    .theme-12 .group-header { background: linear-gradient(135deg, #64748b, #475569); }
+
+    /* 반응형 및 전체화면 시 시인성 보장 */
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      .brand-title { font-size: 1.2rem; }
+      .btn-divide-main { font-size: 1.2rem; }
+      .student-item { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🎲</span>
+      <h1 class="brand-title">우리반 모둠 나누기</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="btnFullscreen" onclick="toggleFullscreen()">
+        <span id="fsIcon">⛶</span> <span id="fsText">전체화면</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. 설정 패널 -->
+    <section class="config-panel" id="configSection">
+      <div class="config-grid">
+        
+        <!-- 기준 선택 -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>⚙️</span> 나눌 방식 선택
+          </label>
+          <div class="segmented-control">
+            <button type="button" class="segmented-btn active" id="btnModeGroup" onclick="setMode('group')">
+              모둠 수 기준 (N개 모둠)
+            </button>
+            <button type="button" class="segmented-btn" id="btnModeMember" onclick="setMode('member')">
+              모둠당 인원수 기준 (N명씩)
+            </button>
+          </div>
+        </div>
+
+        <!-- 총 학생 수 -->
+        <div class="form-group">
+          <label class="form-label" for="totalStudents">
+            <span>👥</span> 우리반 학생 번호 (1번 ~ N번)
+          </label>
+          <div class="stepper">
+            <button type="button" onclick="adjustCount('totalStudents', -1)">-</button>
+            <input type="number" id="totalStudents" min="2" max="60" value="25" onchange="renderAttendanceChips()">
+            <button type="button" onclick="adjustCount('totalStudents', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- 모둠 수 또는 인원수 수량 -->
+        <div class="form-group" id="targetCountGroup">
+          <label class="form-label" id="targetCountLabel" for="targetCount">
+            <span>🎯</span> 만들 모둠 개수
+          </label>
+          <div class="stepper">
+            <button type="button" onclick="adjustCount('targetCount', -1)">-</button>
+            <input type="number" id="targetCount" min="2" max="30" value="5">
+            <button type="button" onclick="adjustCount('targetCount', 1)">+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 결석생 제외 영역 -->
+      <div class="absence-section">
+        <div class="absence-header">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <strong style="font-size:1.05rem; color:#1e293b;">🚫 결석생 제외</strong>
+            <span class="absence-desc">(결석한 학생의 번호를 누르면 제외됩니다)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <span class="absence-count-badge" id="activeStudentBadge">배정 인원: 25명 (결석 0명)</span>
+            <button type="button" class="btn-icon" style="padding:0.35rem 0.65rem; font-size:0.85rem;" onclick="resetAbsentees()">
+              모두 출석
+            </button>
+          </div>
+        </div>
+        <div class="chips-grid" id="chipsContainer">
+          <!-- 번호 칩이 동적으로 렌더링됩니다 -->
+        </div>
+      </div>
+
+      <!-- 선택적 이름 명단 입력 (아코디언) -->
+      <details class="names-accordion">
+        <summary>📝 학생 이름 입력하기 (선택 사항)</summary>
+        <div class="names-input-container">
+          <p class="names-hint">1번부터 차례대로 이름을 엔터(줄바꿈)나 쉼표(,)로 구분해서 입력하세요. 미입력 시 번호만 표시됩니다.</p>
+          <textarea id="studentNamesInput" placeholder="예시:&#10;김철수&#10;이영희&#10;박민수&#10;..."></textarea>
+        </div>
+      </details>
+
+      <!-- 모둠 나누기 실행 버튼 -->
+      <button type="button" class="btn-divide-main" onclick="divideGroups()">
+        <span>🎲</span> 지금 모둠 나누기!
+      </button>
+    </section>
+
+    <!-- 2. 결과 섹션 -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+      <div class="results-toolbar">
+        <div>
+          <h2 class="results-title">
+            <span>🎉</span> 모둠 편성 결과
+            <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);" id="resultMeta"></span>
+          </h2>
+        </div>
+        <div class="results-actions">
+          <button type="button" class="btn-action primary" onclick="divideGroups()">
+            <span>🔄</span> 다시 뽑기
+          </button>
+          <button type="button" class="btn-action highlight" id="btnPickLeaders" onclick="togglePickLeaders()">
+            <span>👑</span> 모둠장 뽑기
+          </button>
+          <button type="button" class="btn-action" id="btnTimerToggle" onclick="toggleTimer()">
+            <span>⏱️</span> 5분 타이머
+          </button>
+          <button type="button" class="btn-action" onclick="copyResultsText()">
+            <span>📋</span> 결과 복사
+          </button>
+          <button type="button" class="btn-action" onclick="scrollToConfig()">
+            <span>⚙️</span> 조건 변경
+          </button>
+        </div>
+      </div>
+
+      <!-- 5분 타이머 대형 디스플레이 영역 -->
+      <div class="timer-container" id="timerContainer" style="display: none;">
+        <div class="timer-top-bar">
+          <span>⏱️ 모둠 활동 5분 타이머</span>
+          <button type="button" class="timer-btn close" onclick="closeTimer()" title="타이머 닫기">✕</button>
+        </div>
+        <div class="timer-display" id="timerDisplay">05:00</div>
+        <div class="timer-progress-bar">
+          <div class="timer-progress-fill" id="timerProgressFill"></div>
+        </div>
+        <div class="timer-controls">
+          <button type="button" class="timer-btn primary" id="btnTimerPlayPause" onclick="toggleTimerPlayPause()">
+            <span id="timerPlayPauseIcon">⏸️</span> <span id="timerPlayPauseText">일시정지</span>
+          </button>
+          <button type="button" class="timer-btn" onclick="addTimerMinute(1)">
+            <span>➕</span> 1분 추가
+          </button>
+          <button type="button" class="timer-btn" onclick="resetTimer(300)">
+            <span>🔄</span> 5분 다시 시작
+          </button>
+        </div>
+      </div>
+
+      <div class="drag-hint">
+        <span>💡</span> 학생 카드를 드래그하여 다른 모둠으로 직접 옮길 수 있습니다. (👑 아이콘을 눌러 개별 모둠장 변경도 가능합니다)
+      </div>
+
+      <!-- 모둠 카드들이 렌더링되는 그리드 -->
+      <div class="groups-grid" id="groupsGrid"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toastMessage">알림 메시지</div>
+
+  <script>
+    // 상태 관리
+    let currentMode = 'group'; // 'group' (모둠수) 또는 'member' (모둠당 인원수)
+    let absentSet = new Set();
+    let currentGroups = []; // [ [ { id, num, name, isLeader }, ... ], ... ]
+    let hasLeaders = false;
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAttendanceChips();
+    });
+
+    // 모드 변경
+    function setMode(mode) {
+      currentMode = mode;
+      const btnGroup = document.getElementById('btnModeGroup');
+      const btnMember = document.getElementById('btnModeMember');
+      const targetLabel = document.getElementById('targetCountLabel');
+      const targetInput = document.getElementById('targetCount');
+
+      if (mode === 'group') {
+        btnGroup.classList.add('active');
+        btnMember.classList.remove('active');
+        targetLabel.innerHTML = '<span>🎯</span> 만들 모둠 개수';
+        targetInput.value = 5;
+      } else {
+        btnMember.classList.add('active');
+        btnGroup.classList.remove('active');
+        targetLabel.innerHTML = '<span>🎯</span> 한 모둠당 인원수';
+        targetInput.value = 4;
+      }
+    }
+
+    // 숫자 조정 스텝퍼
+    function adjustCount(inputId, delta) {
+      const input = document.getElementById(inputId);
+      let val = parseInt(input.value) || 0;
+      val += delta;
+      const min = parseInt(input.min) || 1;
+      const max = parseInt(input.max) || 100;
+      if (val < min) val = min;
+      if (val > max) val = max;
+      input.value = val;
+
+      if (inputId === 'totalStudents') {
+        renderAttendanceChips();
+      }
+    }
+
+    // 결석생 칩 렌더링
+    function renderAttendanceChips() {
+      const totalInput = document.getElementById('totalStudents');
+      let total = parseInt(totalInput.value) || 25;
+      if (total < 1) total = 1;
+      if (total > 80) total = 80;
+      totalInput.value = total;
+
+      // 초과된 결석 번호 정리
+      const validAbsents = new Set();
+      absentSet.forEach(num => {
+        if (num <= total) validAbsents.add(num);
+      });
+      absentSet = validAbsents;
+
+      const container = document.getElementById('chipsContainer');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= total; i++) {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (absentSet.has(i) ? ' absent' : '');
+        chip.textContent = i;
+        chip.title = absentSet.has(i) ? `${i}번 (결석)` : `${i}번 (출석)`;
+        chip.onclick = () => toggleAbsent(i);
+        container.appendChild(chip);
+      }
+
+      updateActiveStudentBadge();
+    }
+
+    // 결석 토글
+    function toggleAbsent(num) {
+      if (absentSet.has(num)) {
+        absentSet.delete(num);
+      } else {
+        absentSet.add(num);
+      }
+      renderAttendanceChips();
+    }
+
+    // 모두 출석으로 리셋
+    function resetAbsentees() {
+      absentSet.clear();
+      renderAttendanceChips();
+      showToast('모든 학생이 출석으로 변경되었습니다.');
+    }
+
+    // 배정 인원 뱃지 업데이트
+    function updateActiveStudentBadge() {
+      const total = parseInt(document.getElementById('totalStudents').value) || 0;
+      const absentCount = absentSet.size;
+      const activeCount = Math.max(0, total - absentCount);
+      const badge = document.getElementById('activeStudentBadge');
+      badge.textContent = `배정 인원: ${activeCount}명 (결석 ${absentCount}명)`;
+    }
+
+    // 이름 명단 파싱
+    function getStudentNames() {
+      const text = document.getElementById('studentNamesInput').value.trim();
+      if (!text) return {};
+      const lines = text.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      const map = {};
+      lines.forEach((name, idx) => {
+        map[idx + 1] = name;
+      });
+      return map;
+    }
+
+    // 모둠 나누기 핵심 알고리즘
+    function divideGroups() {
+      const total = parseInt(document.getElementById('totalStudents').value) || 25;
+      const targetVal = parseInt(document.getElementById('targetCount').value) || 4;
+      const namesMap = getStudentNames();
+
+      // 출석 학생 리스트 구성
+      const students = [];
+      for (let i = 1; i <= total; i++) {
+        if (!absentSet.has(i)) {
+          students.push({
+            id: i,
+            num: i,
+            name: namesMap[i] || '',
+            isLeader: false
+          });
+        }
+      }
+
+      if (students.length === 0) {
+        alert('출석한 학생이 없습니다. 총 학생 수나 결석 상태를 확인해 주세요.');
+        return;
+      }
+
+      // 모둠 수 계산
+      let numGroups = 1;
+      if (currentMode === 'group') {
+        numGroups = Math.max(1, Math.min(targetVal, students.length));
+      } else {
+        // 모둠당 인원수 기준
+        const membersPerGroup = Math.max(1, targetVal);
+        numGroups = Math.max(1, Math.ceil(students.length / membersPerGroup));
+      }
+
+      // Fisher-Yates 무작위 셔플
+      const shuffled = [...students];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // 균등 분배 (차이가 최대 1명이 되도록)
+      const groups = Array.from({ length: numGroups }, () => []);
+      shuffled.forEach((student, index) => {
+        const groupIndex = index % numGroups;
+        groups[groupIndex].push(student);
+      });
+
+      // 만약 모둠장 선출 상태였다면 초기화
+      hasLeaders = false;
+      document.getElementById('btnPickLeaders').innerHTML = '<span>👑</span> 모둠장 뽑기';
+
+      currentGroups = groups;
+      renderResults();
+
+      // 결과 화면 표시 및 스크롤
+      const resultsSection = document.getElementById('resultsSection');
+      resultsSection.style.display = 'flex';
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 결과 렌더링
+    function renderResults() {
+      const grid = document.getElementById('groupsGrid');
+      grid.innerHTML = '';
+
+      const totalActive = currentGroups.reduce((acc, g) => acc + g.length, 0);
+      document.getElementById('resultMeta').textContent = `(총 ${currentGroups.length}개 모둠 / ${totalActive}명)`;
+
+      currentGroups.forEach((group, groupIdx) => {
+        const themeNum = (groupIdx % 12) + 1;
+        const card = document.createElement('div');
+        card.className = `group-card theme-${themeNum}`;
+        card.dataset.groupIndex = groupIdx;
+
+        // 드래그 앤 드롭 영역 이벤트
+        card.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          card.classList.add('drag-over');
+        });
+        card.addEventListener('dragleave', () => {
+          card.classList.remove('drag-over');
+        });
+        card.addEventListener('drop', (e) => {
+          e.preventDefault();
+          card.classList.remove('drag-over');
+          handleDrop(e, groupIdx);
+        });
+
+        // 헤더
+        const header = document.createElement('div');
+        header.className = 'group-header';
+        header.innerHTML = `
+          <span>${groupIdx + 1} 모둠</span>
+          <span class="group-count-tag">${group.length}명</span>
+        `;
+        card.appendChild(header);
+
+        // 멤버 리스트
+        const list = document.createElement('div');
+        list.className = 'group-members-list';
+
+        group.forEach((student) => {
+          const item = document.createElement('div');
+          item.className = 'student-item' + (student.isLeader ? ' is-leader' : '');
+          item.draggable = true;
+
+          item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+              studentId: student.id,
+              sourceGroup: groupIdx
+            }));
+            item.style.opacity = '0.5';
+          });
+
+          item.addEventListener('dragend', () => {
+            item.style.opacity = '1';
+          });
+
+          const displayName = student.name ? `${student.name}` : `${student.num}번`;
+
+          item.innerHTML = `
+            <div class="student-left">
+              <span class="student-num-badge">${student.num}</span>
+              <span class="student-name">${displayName}</span>
+              ${student.isLeader ? '<span class="leader-badge">👑 모둠장</span>' : ''}
+            </div>
+            <button class="leader-btn-toggle" title="${student.isLeader ? '모둠장 해제' : '모둠장으로 지정'}" onclick="toggleSingleLeader(${groupIdx}, ${student.id})">
+              ${student.isLeader ? '⭐' : '👑'}
+            </button>
+          `;
+
+          list.appendChild(item);
+        });
+
+        card.appendChild(list);
+        grid.appendChild(card);
+      });
+    }
+
+    // 학생 개별 모둠장 토글
+    function toggleSingleLeader(groupIdx, studentId) {
+      const group = currentGroups[groupIdx];
+      const student = group.find(s => s.id === studentId);
+      if (!student) return;
+
+      if (student.isLeader) {
+        student.isLeader = false;
+      } else {
+        // 해당 모둠의 다른 모둠장 해제 후 이 학생을 모둠장으로
+        group.forEach(s => s.isLeader = false);
+        student.isLeader = true;
+      }
+      renderResults();
+    }
+
+    // 전체 모둠장 일괄 뽑기 / 다시 뽑기
+    function togglePickLeaders() {
+      // 각 모둠에서 무작위 1명씩 모둠장 지정
+      currentGroups.forEach(group => {
+        if (group.length === 0) return;
+        group.forEach(s => s.isLeader = false);
+        const randomIdx = Math.floor(Math.random() * group.length);
+        group[randomIdx].isLeader = true;
+      });
+
+      hasLeaders = true;
+      document.getElementById('btnPickLeaders').innerHTML = '<span>👑</span> 모둠장 다시 뽑기';
+      renderResults();
+      showToast('모둠별로 1명씩 모둠장이 선출되었습니다!');
+    }
+
+    // 드래그 앤 드롭 이동 처리
+    function handleDrop(e, targetGroupIdx) {
+      const dataStr = e.dataTransfer.getData('text/plain');
+      if (!dataStr) return;
+
+      try {
+        const { studentId, sourceGroup } = JSON.parse(dataStr);
+        if (sourceGroup === targetGroupIdx) return; // 같은 모둠으로 이동 시 무시
+
+        const sourceList = currentGroups[sourceGroup];
+        const studentIdx = sourceList.findIndex(s => s.id === studentId);
+        if (studentIdx === -1) return;
+
+        const [movedStudent] = sourceList.splice(studentIdx, 1);
+        currentGroups[targetGroupIdx].push(movedStudent);
+
+        renderResults();
+        showToast(`${movedStudent.num}번 학생을 ${targetGroupIdx + 1}모둠으로 이동했습니다.`);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // 결과 텍스트 복사
+    function copyResultsText() {
+      if (currentGroups.length === 0) return;
+
+      let text = `[우리반 모둠 편성 결과]\n`;
+      currentGroups.forEach((group, idx) => {
+        text += `\n▶ ${idx + 1}모둠 (${group.length}명)\n`;
+        group.forEach(s => {
+          const namePart = s.name ? `${s.name} (${s.num}번)` : `${s.num}번`;
+          const leaderPart = s.isLeader ? ' [👑모둠장]' : '';
+          text += `  - ${namePart}${leaderPart}\n`;
+        });
+      });
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 모둠 편성 결과가 클립보드에 복사되었습니다!');
+      }).catch(() => {
+        // 폴백
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('📋 모둠 편성 결과가 클립보드에 복사되었습니다!');
+      });
+    }
+
+    // 설정으로 스크롤 이동
+    function scrollToConfig() {
+      document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 전체화면 토글
+    function toggleFullscreen() {
+      const fsIcon = document.getElementById('fsIcon');
+      const fsText = document.getElementById('fsText');
+
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          fsIcon.textContent = '✕';
+          fsText.textContent = '창 모드';
+        }).catch(err => {
+          console.warn('전체화면 전환 실패:', err);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().then(() => {
+            fsIcon.textContent = '⛶';
+            fsText.textContent = '전체화면';
+          });
+        }
+      }
+    }
+
+    // 전체화면 변경 이벤트 감지
+    document.addEventListener('fullscreenchange', () => {
+      const fsIcon = document.getElementById('fsIcon');
+      const fsText = document.getElementById('fsText');
+      if (document.fullscreenElement) {
+        fsIcon.textContent = '✕';
+        fsText.textContent = '창 모드';
+      } else {
+        fsIcon.textContent = '⛶';
+        fsText.textContent = '전체화면';
+      }
+    });
+
+    // 토스트 팝업 표시
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      toast.textContent = message;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    /* ===== 5분 타이머 로직 ===== */
+    let timerDuration = 300; // 5분 = 300초
+    let timerRemaining = 300;
+    let timerInterval = null;
+    let isTimerRunning = false;
+
+    // 타이머 열기/스크롤 토글
+    function toggleTimer() {
+      const container = document.getElementById('timerContainer');
+      if (container.style.display === 'none') {
+        container.style.display = 'flex';
+        resetTimer(300);
+      }
+      container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // 타이머 닫기
+    function closeTimer() {
+      pauseTimer();
+      document.getElementById('timerContainer').style.display = 'none';
+    }
+
+    // 타이머 시작
+    function startTimer() {
+      if (isTimerRunning) return;
+      isTimerRunning = true;
+      updatePlayPauseButton();
+
+      timerInterval = setInterval(() => {
+        if (timerRemaining > 0) {
+          timerRemaining--;
+          updateTimerDisplay();
+        } else {
+          pauseTimer();
+          playTimerAlarm();
+          showToast('⏰ 5분 활동 시간이 종료되었습니다!');
+        }
+      }, 1000);
+    }
+
+    // 타이머 일시정지
+    function pauseTimer() {
+      isTimerRunning = false;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      updatePlayPauseButton();
+    }
+
+    // 재생/일시정지 토글
+    function toggleTimerPlayPause() {
+      if (isTimerRunning) {
+        pauseTimer();
+      } else {
+        if (timerRemaining <= 0) {
+          timerRemaining = timerDuration || 300;
+        }
+        startTimer();
+      }
+    }
+
+    // 재생/일시정지 버튼 텍스트 갱신
+    function updatePlayPauseButton() {
+      const icon = document.getElementById('timerPlayPauseIcon');
+      const text = document.getElementById('timerPlayPauseText');
+      if (isTimerRunning) {
+        icon.textContent = '⏸️';
+        text.textContent = '일시정지';
+      } else {
+        icon.textContent = '▶️';
+        text.textContent = '계속 진행';
+      }
+    }
+
+    // 타이머 리셋
+    function resetTimer(seconds = 300) {
+      pauseTimer();
+      timerDuration = seconds;
+      timerRemaining = seconds;
+      updateTimerDisplay();
+      startTimer();
+    }
+
+    // 1분 추가
+    function addTimerMinute(mins = 1) {
+      timerRemaining += mins * 60;
+      timerDuration = Math.max(timerDuration, timerRemaining);
+      updateTimerDisplay();
+      showToast(`⏱️ 시간이 ${mins}분 추가되었습니다.`);
+    }
+
+    // 시간 표시 및 프로그레스 바 갱신
+    function updateTimerDisplay() {
+      const display = document.getElementById('timerDisplay');
+      const progressFill = document.getElementById('timerProgressFill');
+
+      const minutes = Math.floor(timerRemaining / 60);
+      const seconds = timerRemaining % 60;
+      display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+      // 색상 경고 효과
+      display.classList.remove('warning', 'danger');
+      if (timerRemaining <= 30 && timerRemaining > 0) {
+        display.classList.add('danger');
+      } else if (timerRemaining <= 60 && timerRemaining > 0) {
+        display.classList.add('warning');
+      }
+
+      // 프로그레스 바 비율
+      const percent = timerDuration > 0 ? (timerRemaining / timerDuration) * 100 : 0;
+      progressFill.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+    }
+
+    // Web Audio API를 활용한 오프라인 알림 차임벨
+    function playTimerAlarm() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const audioCtx = new AudioCtx();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          const startTime = audioCtx.currentTime + idx * 0.16;
+          gain.gain.setValueAtTime(0.25, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.4);
+        });
+      } catch (e) {
+        console.warn('Audio feedback failed:', e);
+      }
+    }
+  </script>
+</body>
+</html>
