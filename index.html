@@ -62,6 +62,12 @@
       gap: 0.75rem;
     }
 
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
     .brand-icon {
       font-size: 2rem;
       line-height: 1;
@@ -72,6 +78,14 @@
       font-weight: 800;
       letter-spacing: -0.5px;
       color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .brand-date {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1;
     }
 
     .header-actions {
@@ -779,7 +793,10 @@
   <header>
     <div class="brand">
       <span class="brand-icon">🎲</span>
-      <h1 class="brand-title">우리반 모둠 나누기</h1>
+      <div class="brand-text">
+        <h1 class="brand-title">우리반 모둠 나누기</h1>
+        <p class="brand-date" id="currentDate"></p>
+      </div>
     </div>
     <div class="header-actions">
       <button class="btn-icon" id="btnFullscreen" onclick="toggleFullscreen()">
@@ -939,8 +956,23 @@
 
     // 초기화
     window.addEventListener('DOMContentLoaded', () => {
+      displayTodayDate();
       renderAttendanceChips();
     });
+
+    // 오늘 날짜 표시
+    function displayTodayDate() {
+      const now = new Date();
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const dayName = days[now.getDay()];
+      const dateEl = document.getElementById('currentDate');
+      if (dateEl) {
+        dateEl.textContent = `${year}년 ${month}월 ${date}일 (${dayName})`;
+      }
+    }
 
     // 모드 변경
     function setMode(mode) {
